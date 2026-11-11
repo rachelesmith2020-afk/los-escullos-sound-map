@@ -1,0 +1,159 @@
+<title>Los Escullos Sound Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Twenty listening points on the fossil dunes and volcanic coast of Los Escullos, Cabo de Gata-Níjar Natural Park, recorded on foot by OOLITA.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: the map is the page. Tall map, a listening card under it, then the points by zone. */
+:root{
+  --bg:#f4efe6; --surface:#fffdf9; --fg:#25211c; --muted:#6c6457; --line:#e0d6c5;
+  --land:#ebe2d1; --sand:#dcc497; --sea:#bcd5d9; --road:#fffaf1; --track:#9a8970; --stream:#7ea6b0; --bld:#8b7e6c;
+  --pin:#2f6f66; --pinhi:#b5762b; --oolite:#a8742c;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#191a19; --surface:#222321; --fg:#ece6dc; --muted:#a39b8e; --line:#383732;
+  --land:#2b2a25; --sand:#5a4e36; --sea:#1f3337; --road:#4a473f; --track:#77684f; --stream:#4f7d88; --bld:#615849;
+  --pin:#6fb7aa; --pinhi:#e0a75c; --oolite:#d9a65a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#191a19; --surface:#222321; --fg:#ece6dc; --muted:#a39b8e; --line:#383732;
+  --land:#2b2a25; --sand:#5a4e36; --sea:#1f3337; --road:#4a473f; --track:#77684f; --stream:#4f7d88; --bld:#615849;
+  --pin:#6fb7aa; --pinhi:#e0a75c; --oolite:#d9a65a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55}
+.wrap{max-width:980px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.coords{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--oolite);margin:0 0 8px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(34px,7vw,64px);line-height:.98;letter-spacing:-.01em;margin:0 0 12px;text-wrap:balance}
+.lede{max-width:60ch;color:var(--muted);margin:0 0 18px;font-size:17px}
+.stage{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:760px){.stage{grid-template-columns:1fr}}
+.mapbox{position:relative;border-radius:10px;overflow:hidden;background:var(--sea);border:1px solid var(--line)}
+.mapbox svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.land{fill:var(--land)} .beach{fill:var(--sand)} .stream{fill:none;stroke:var(--stream);stroke-width:3}
+.bld{fill:var(--bld)} .path{fill:none;stroke:var(--track);stroke-width:2;stroke-dasharray:6 5}
+.track{fill:none;stroke:var(--track);stroke-width:3;opacity:.8} .road{fill:none;stroke:var(--road);stroke-width:9;stroke-linecap:round}
+.lbl{font-family:var(--mono);font-size:30px;fill:var(--muted);letter-spacing:.04em;paint-order:stroke;stroke:var(--land);stroke-width:8px}
+.lbl.sea{fill:var(--stream);stroke:none;font-style:italic}
+.pin{cursor:pointer}
+.pin .hit{fill:transparent}
+.pin .dot{fill:var(--surface);stroke:var(--pin);stroke-width:6}
+.pin.rec .dot{fill:var(--pin);stroke:var(--surface)}
+.pin.sel .dot{stroke:var(--pinhi);stroke-width:9}
+.pin.rec .ring{fill:none;stroke:var(--pin);stroke-width:4;opacity:.6;transform-box:fill-box;transform-origin:center;animation:ring 2.4s ease-out infinite}
+@keyframes ring{from{transform:scale(1);opacity:.6}to{transform:scale(2.4);opacity:0}}
+@media (prefers-reduced-motion:reduce){.pin.rec .ring{animation:none}}
+.pin text{font-family:var(--mono);font-size:24px;fill:var(--fg);paint-order:stroke;stroke:var(--land);stroke-width:7px;pointer-events:none}
+.mapctl{position:absolute;top:10px;left:10px;display:flex;gap:6px;flex-wrap:wrap}
+.mapctl button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:6px 12px;cursor:pointer}
+.mapctl button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:10px 2px 0}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:6px;border:3px solid var(--pin)}
+.legend i.r{background:var(--pin)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+.card .ph{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--land);max-width:100%}
+.card .noph{aspect-ratio:4/3;display:grid;place-items:center;background:var(--land);color:var(--muted);font-size:14px;padding:20px;text-align:center}
+.card .in{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px}
+.card .id{font-family:var(--mono);font-size:12px;color:var(--oolite);letter-spacing:.05em}
+.card h2{font-family:var(--display);font-weight:700;font-size:26px;line-height:1.1;margin:0;text-wrap:balance}
+.card .meta{color:var(--muted);font-size:14px;margin:0}
+.card audio{width:100%}
+.loop{display:flex;align-items:center;gap:.5rem;margin-top:.6rem;font-size:.9rem;color:var(--muted,inherit);cursor:pointer}
+.loop input{width:1.1rem;height:1.1rem;accent-color:currentColor}
+.card .soon{font-size:14px;border:1px dashed var(--line);border-radius:8px;padding:10px 12px;color:var(--muted)}
+.card .links{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}
+.card .links a{color:var(--pin);font-weight:700}
+.card .cr{font-size:12px;color:var(--muted)}
+.card .cr a{color:var(--muted)}
+.play{font:inherit;font-weight:700;font-size:15px;border:0;border-radius:999px;padding:11px 16px;background:var(--pin);color:var(--bg);cursor:pointer;align-self:flex-start}
+:focus-visible{outline:2px solid var(--pinhi);outline-offset:2px}
+h3.z{font-family:var(--display);font-weight:500;font-size:22px;margin:36px 0 8px}
+.zone-note{color:var(--muted);margin:0 0 6px;max-width:62ch}
+.pt{display:grid;grid-template-columns:3.6em 1fr auto;gap:10px;align-items:baseline;padding:11px 0;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;font:inherit;color:inherit}
+.pt .n{font-family:var(--mono);font-size:13px;color:var(--oolite)}
+.pt .t{min-width:0}
+.pt .s{font-size:12px;color:var(--muted);white-space:nowrap}
+.pt .s.r{color:var(--pin);font-weight:700}
+.pt:hover .t{text-decoration:underline}
+footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px;max-width:72ch}
+footer a{color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <p class="coords">36.80° N · 2.06° W · CABO DE GATA-NÍJAR NATURAL PARK</p>
+  <h1>Los Escullos Sound Map</h1>
+  <p class="lede">Twenty listening points on the fossil dunes, volcanic coast and dry scrub of Los Escullos, Almería. Each is recorded on foot and pinned where it was heard. Tap a point to listen.</p>
+
+  <div class="stage">
+    <div>
+      <div class="mapbox">
+        <svg id="map" viewBox="0 0 __W__ __H__" role="img" aria-label="Map of Los Escullos with listening points">
+          <rect width="100%" height="100%" fill="var(--sea)"/>
+          __SVG__
+          <text class="lbl sea" x="1050" y="960">Mediterranean</text>
+          <text class="lbl" x="905" y="180">Playa del Arco</text>
+          <text class="lbl" x="760" y="430">Los Escullos</text>
+          <text class="lbl" x="930" y="1070">El Embarcadero</text>
+          <text class="lbl" x="330" y="760">scrub</text>
+          <g id="pins"></g>
+        </svg>
+        <div class="mapctl">
+          <button type="button" id="vAll" aria-pressed="true">Whole area</button>
+          <button type="button" id="vCoast" aria-pressed="false">Castle coast</button>
+        </div>
+      </div>
+      <div class="legend"><span><i class="r"></i>Recorded</span><span><i></i>Coming soon</span></div>
+    </div>
+    <aside class="card" id="card" aria-live="polite"></aside>
+  </div>
+
+  <div id="zones"></div>
+
+  <footer>
+    <span>Recordings © OOLITA, licensed <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>. Also on <a href="__PACK__" target="_blank" rel="noopener">Freesound</a>.</span>
+    <span>Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, ODbL.</span>
+    <span>Reference photos from Wikimedia Commons, credited on each point.</span>
+    <span>Part of <a href="https://oolita.es" target="_blank" rel="noopener">OOLITA</a>.</span>
+  </footer>
+</div>
+
+<script>
+const SPOTS=__SPOTS__;
+const PHOTOS=__PHOTOS__;
+const AUDIO=__AUDIO__;
+const ZONES={dune:["Playa del Arco and the fossil dune","Sand, wind-carved oolite and the sea at the north of the village."],castle:["Castillo de San Felipe and the coast south","The 18th-century battery and the low dune cliffs and reefs below it."],emb:["El Embarcadero","Pebble shore, rocky coves and Posidonia offshore, with scrub behind the beach."],inland:["Scrub between the village and the camping","Dry volcanic ground, esparto and night sounds away from the sea."]};
+const VIEW_ALL="0 0 __W__ __H__", VIEW_COAST="700 560 520 700";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let sel=null;
+
+function drawPins(){
+  const g=$("pins");
+  g.innerHTML=SPOTS.map(s=>{const rec=!!AUDIO[s.id];
+    return `<g class="pin${rec?" rec":""}${sel===s.id?" sel":""}" data-id="${s.id}" tabindex="0" role="button" aria-label="${esc(s.id+' '+s.name+(rec?', recorded':', coming soon'))}">
+      <circle class="hit" cx="${s.x}" cy="${s.y}" r="34"/>${rec?`<circle class="ring" cx="${s.x}" cy="${s.y}" r="14"/>`:""}
+      <circle class="dot" cx="${s.x}" cy="${s.y}" r="14"/><text x="${s.x+20}" y="${s.y+8}">${s.id.slice(3)}</text></g>`;}).join("");
+  g.querySelectorAll(".pin").forEach(p=>{p.addEventListener("click",()=>show(p.dataset.id));p.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();show(p.dataset.id);}});});
+}
+function show(id,scroll){
+  sel=id; const s=SPOTS.find(x=>x.id===id); const a=AUDIO[id];
+  const ph=PHOTOS[id]?`<img class="ph" src="${esc(PHOTOS[id])}" alt="${esc(s.photoNote)}">`:`<div class="noph">Photo to come, taken at the recording.</div>`;
+  const cr=s.credit?(s.src?`<span class="cr">Photo: <a href="${esc(s.src)}" target="_blank" rel="noopener">${esc(s.credit)}</a>, Wikimedia Commons</span>`:`<span class="cr">Photo: ${esc(s.credit)}</span>`):"";
+  const listen=a?`<button type="button" class="play" id="playBtn">Play recording</button><div id="player"></div>${a.notes?`<p class="meta">${esc(a.notes)}</p>`:""}`:`<div class="soon">Not recorded yet. Best heard: ${esc(s.best.toLowerCase())}.</div>`;
+  $("card").innerHTML=`${ph}<div class="in"><span class="id">${esc(s.id)} · ${esc(ZONES[s.zone][0])}</span><h2>${esc(s.name)}</h2>
+    ${a?`<p class="meta">Recorded ${esc(a.when)}</p>`:""}${listen}
+    <div class="links"><a href="https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}" target="_blank" rel="noopener">Open in Maps</a>${a&&a.freesound?`<a href="${esc(a.freesound)}" target="_blank" rel="noopener">On Freesound</a>`:""}</div>${cr}</div>`;
+  if(a){$("playBtn").addEventListener("click",()=>{const au=document.createElement("audio");au.controls=true;au.preload="auto";au.loop=true;au.src=a.url;const lp=document.createElement("label");lp.className="loop";const cb=document.createElement("input");cb.type="checkbox";cb.checked=true;cb.addEventListener("change",()=>{au.loop=cb.checked;});lp.append(cb," Loop this recording");$("player").replaceChildren(au,lp);$("playBtn").remove();au.play().catch(()=>{});});}
+  drawPins();
+  if(scroll) $("card").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function zones(){
+  $("zones").innerHTML=Object.entries(ZONES).map(([k,[t,n]])=>{const pts=SPOTS.filter(s=>s.zone===k);
+    return `<h3 class="z">${esc(t)}</h3><p class="zone-note">${esc(n)}</p>`+pts.map(s=>`<button type="button" class="pt" data-id="${s.id}"><span class="n">${s.id.slice(3)}</span><span class="t">${esc(s.name)}</span><span class="s${AUDIO[s.id]?" r":""}">${AUDIO[s.id]?"Listen":"Coming soon"}</span></button>`).join("");}).join("");
+  document.querySelectorAll(".pt").forEach(b=>b.addEventListener("click",()=>show(b.dataset.id,true)));
+}
+function setView(v){$("map").setAttribute("viewBox",v==="coast"?VIEW_COAST:VIEW_ALL);$("vAll").setAttribute("aria-pressed",v!=="coast");$("vCoast").setAttribute("aria-pressed",v==="coast");}
+$("vAll").addEventListener("click",()=>setView("all"));$("vCoast").addEventListener("click",()=>setView("coast"));
+zones(); show(Object.keys(AUDIO)[0]||SPOTS[0].id);
+</script>
